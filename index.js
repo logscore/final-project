@@ -107,26 +107,17 @@ app.post("/login", (req, res) => {
         return res.render("login", { error_message: "Invalid email or password" });
       }
 
-      bcrypt.compare(sPassword, user.password, (err, isMatch) => {
-        if (err) {
-          console.error("Password comparison error:", err);
-          return res.render("login", {
-            error_message: "Database error. Please try again.",
-          });
-        }
-
-        if (isMatch) {
-          req.session.isLoggedIn = true;
-          req.session.userId = user.id;
-          req.session.email = user.email;
-          req.session.name = user.name;
-          console.log(`User logged in: ${user.email} (ID: ${user.id})`);
-          res.redirect("/dashboard");
-        } else {
-          console.warn(`Failed login attempt for email: ${sEmail}`);
-          res.render("login", { error_message: "Invalid email or password" });
-        }
-      });
+      if (sPassword === user.password) {
+        req.session.isLoggedIn = true;
+        req.session.userId = user.id;
+        req.session.email = user.email;
+        req.session.name = user.name;
+        console.log(`User logged in: ${user.email} (ID: ${user.id})`);
+        res.redirect("/dashboard");
+      } else {
+        console.warn(`Failed login attempt for email: ${sEmail}`);
+        res.render("login", { error_message: "Invalid email or password" });
+      }
     })
     .catch((err) => {
       console.error("Login error:", err);
@@ -160,39 +151,29 @@ app.post("/signup", (req, res) => {
     });
   }
 
-  // Hash password with bcrypt
-  bcrypt.hash(password, 10, (err, hashedPassword) => {
-    if (err) {
-      console.error("Password hashing error:", err);
-      return res.render("signup", {
-        error_message: "An error occurred. Please try again.",
-      });
-    }
-
-    knex("users")
-      .select("email")
-      .where("email", email)
-      .then((users) => {
-        if (users.length > 0) {
-          return res.render("signup", {
-            error_message: "Email already exists.",
-          });
-        }
-
-        return knex("users")
-          .insert({ name, email, password: hashedPassword })
-          .then(() => {
-            console.log(`New user created: ${email}`);
-            res.redirect("/login");
-          });
-      })
-      .catch((err) => {
-        console.error("Signup error:", err);
-        res.render("signup", {
-          error_message: "Database error. Please try again.",
+  knex("users")
+    .select("email")
+    .where("email", email)
+    .then((users) => {
+      if (users.length > 0) {
+        return res.render("signup", {
+          error_message: "Email already exists.",
         });
+      }
+
+      return knex("users")
+        .insert({ name, email, password })
+        .then(() => {
+          console.log(`New user created: ${email}`);
+          res.redirect("/login");
+        });
+    })
+    .catch((err) => {
+      console.error("Signup error:", err);
+      res.render("signup", {
+        error_message: "Database error. Please try again.",
       });
-  });
+    });
 });
 
 app.get("/logout", (req, res) => {
