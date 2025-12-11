@@ -10,9 +10,11 @@
     "typescript": "^5"
   },
   "scripts": {
-    "dev": "bun --watch index.js"
+    "dev": "bun --watch index.js",
+    "serve": "bun run index.js"
   },
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "body-parser": "^2.2.1",
     "connect-pg-simple": "^10.0.0",
     "dotenv": "^17.2.3",

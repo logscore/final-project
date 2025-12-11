@@ -1,339 +1,504 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Ella Rises – Empowering Young Women</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Personal Budget Planner - Take Control of Your Finances</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-<!-- Bootstrap -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #333;
+      overflow-x: hidden;
+    }
 
-<!-- Google Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&display=swap" rel="stylesheet">
+    /* NAVBAR */
+    .navbar-custom {
+      background: white;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      padding: 1rem 0;
+    }
 
-<style>
-  :root {
-    --cream: #f9f5ea;
-    --light-pink: #ffd8d1;
-    --pink: #f9afb1;
-    --sage: #9ab59d;
-    --gray: #3a3f3b;
-    --coral: #f4b092;
-    --rose: #ce325b;
-  }
+    .navbar-brand {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #667eea !important;
+    }
 
-  body {
-    font-family: Arial, sans-serif;
-    background-color: var(--light-pink);
-    margin: 0;
-    padding: 0;
-    color: var(--gray);
-  }
+    .navbar-brand span {
+      color: #764ba2;
+    }
 
-  /* NAVBAR */
-  .navbar-custom {
-    background-color: white;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-  }
+    .navbar-nav .nav-link {
+      font-weight: 500;
+      color: #555 !important;
+      margin: 0 0.5rem;
+      transition: color 0.3s;
+    }
 
-  .navbar-brand {
-    font-family: 'DM Serif Display', serif;
-    font-size: 1.8rem;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: var(--gray) !important;
-  }
+    .navbar-nav .nav-link:hover {
+      color: #667eea !important;
+    }
 
-  .navbar-links a {
-    text-decoration: none;
-    margin: 0 15px;
-    color: var(--gray);
-    font-weight: 500;
-  }
+    .navbar-nav .nav-link.active {
+      color: #667eea !important;
+      border-bottom: 2px solid #667eea;
+    }
 
-  .navbar-links a:hover,
-  .nav-right a:hover {
-    text-decoration: underline;
-  }
+    /* HERO SECTION */
+    .hero {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 120px 20px;
+      text-align: center;
+    }
 
-  .nav-right a {
-    margin-left: 15px;
-    color: var(--gray);
-    text-decoration: none;
-    font-weight: 500;
-  }
+    .hero h1 {
+      font-size: 3.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      animation: fadeInDown 0.8s ease;
+    }
 
-  /* HERO SECTION */
-  .hero {
-    text-align: center;
-    padding: 140px 20px 120px;
-    background-color: var(--light-pink);
-  }
+    .hero p {
+      font-size: 1.3rem;
+      margin-bottom: 2rem;
+      opacity: 0.95;
+      animation: fadeInUp 0.8s ease 0.2s both;
+    }
 
-  .hero h1 {
-    font-family: 'DM Serif Display', serif;
-    font-size: 3rem;
-    color: var(--gray);
-    margin-bottom: 20px;
-  }
+    .hero-buttons {
+      animation: fadeInUp 0.8s ease 0.4s both;
+    }
 
-  .hero-buttons .btn {
-    margin: 8px;
-    padding: 12px 28px;
-    font-size: 1.1rem;
-    border-radius: 25px;
-  }
+    .btn-primary-custom {
+      background: white;
+      color: #667eea;
+      padding: 0.9rem 2.5rem;
+      border-radius: 8px;
+      font-weight: 700;
+      border: none;
+      margin: 0.5rem;
+      text-decoration: none;
+      display: inline-block;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
 
-  .btn-white {
-    background: white;
-    border: 2px solid var(--gray);
-    color: var(--gray);
-  }
-  .btn-white:hover {
-    background: var(--cream);
-  }
+    .btn-primary-custom:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      color: #667eea;
+    }
 
-  .btn-donate {
-    background: var(--rose);
-    color: white;
-    font-weight: bold;
-    border: none;
-  }
-  .btn-donate:hover {
-    background: #b42b50;
-  }
+    .btn-secondary-custom {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      padding: 0.9rem 2.5rem;
+      border-radius: 8px;
+      font-weight: 700;
+      border: 2px solid white;
+      margin: 0.5rem;
+      text-decoration: none;
+      display: inline-block;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
 
-  /* CURVED SECTION WRAPPERS */
-  .section-wrapper {
-    background: white;
-    padding: 80px 20px;
-    border-top-left-radius: 100px;
-    border-top-right-radius: 100px;
-    margin-top: -50px;
-  }
+    .btn-secondary-custom:hover {
+      background: white;
+      color: #667eea;
+    }
 
-  /* GENERIC SECTION */
-  .section-title {
-    font-family: 'DM Serif Display', serif;
-    text-align: center;
-    font-size: 2.4rem;
-    margin-bottom: 40px;
-  }
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
 
-  /* IMAGE PLACEHOLDERS */
-.img-placeholder {
-    width: 100%;             /* Make image fill the width of the white card */
-    height: 200px;           /* FORCE all images to be the same height */
-    object-fit: cover;       /* The Magic Line: Crops the image so it doesn't squish */
-    border: none;            /* Removes the dotted border */
-    border-radius: 10px;     /* Rounds the corners to look nice */
-    display: block;          /* Required for centering */
-    margin: 0 auto;          /* Centers the image horizontally */
-}
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
 
-  /* PROGRAM CARDS */
-  .program-card {
-    background: white;
-    border-radius: 18px;
-    padding: 25px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    height: 100%;
-    transition: transform 0.2s ease;
-  }
-  .program-card:hover {
-    transform: translateY(-5px);
-  }
-  .program-card h4 {
-    font-family: 'DM Serif Display', serif;
-    margin-top: 15px;
-    text-align: center;
-  }
+    /* FEATURES SECTION */
+    .features-section {
+      padding: 80px 20px;
+      background: #f8f9fa;
+    }
 
-  /* FOOTER */
-  .footer {
-    background-color: black;
-    color: white;
-    height: 100px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 0;
-  }
+    .section-title {
+      font-size: 2.8rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 3rem;
+      color: #333;
+    }
 
-  .footer-text {
-    font-family: 'DM Serif Display', serif;
-    font-size: 1.5rem;
-    display: flex;
-    gap: 10px;
-    align-items: center;
-  }
+    .feature-card {
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s;
+      margin-bottom: 2rem;
+    }
 
-  .copyright {
-    text-align: center;
-    padding: 8px 0 20px;
-    font-size: 0.9rem;
-  }
-</style>
+    .feature-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.2);
+    }
+
+    .feature-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .feature-card h3 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: #333;
+    }
+
+    .feature-card p {
+      font-size: 1rem;
+      color: #666;
+      line-height: 1.6;
+    }
+
+    /* BENEFITS SECTION */
+    .benefits-section {
+      padding: 80px 20px;
+      background: white;
+    }
+
+    .benefits-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+    }
+
+    .benefit-item {
+      padding: 2rem;
+      border-left: 4px solid #667eea;
+      background: #f8f9fa;
+      border-radius: 8px;
+    }
+
+    .benefit-item h4 {
+      color: #667eea;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      font-size: 1.2rem;
+    }
+
+    .benefit-item p {
+      color: #666;
+      line-height: 1.6;
+    }
+
+    /* CTA SECTION */
+    .cta-section {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 80px 20px;
+      text-align: center;
+      color: white;
+    }
+
+    .cta-section h2 {
+      font-size: 2.5rem;
+      margin-bottom: 1.5rem;
+      font-weight: 700;
+    }
+
+    .cta-section p {
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+      opacity: 0.95;
+    }
+
+    /* FOOTER */
+    .footer {
+      background: #333;
+      color: white;
+      padding: 3rem 2rem 1rem;
+      text-align: center;
+    }
+
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto 2rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+      text-align: left;
+    }
+
+    .footer-section h4 {
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: #667eea;
+    }
+
+    .footer-section ul {
+      list-style: none;
+    }
+
+    .footer-section ul li {
+      margin-bottom: 0.5rem;
+    }
+
+    .footer-section a {
+      color: #ccc;
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    .footer-section a:hover {
+      color: #667eea;
+    }
+
+    .footer-bottom {
+      border-top: 1px solid #555;
+      padding-top: 1.5rem;
+    }
+
+    .footer-bottom p {
+      margin: 0.5rem 0;
+      font-size: 0.9rem;
+      color: #999;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .hero h1 {
+        font-size: 2.5rem;
+      }
+
+      .hero p {
+        font-size: 1.1rem;
+      }
+
+      .section-title {
+        font-size: 2rem;
+      }
+
+      .cta-section h2 {
+        font-size: 2rem;
+      }
+
+      .btn-primary-custom,
+      .btn-secondary-custom {
+        padding: 0.7rem 1.5rem;
+        font-size: 0.95rem;
+      }
+    }
+  </style>
 </head>
-
 <body>
-
-<!-- NAVBAR -->
-<nav class="navbar navbar-expand-lg navbar-custom fixed-top">
-  <div class="container">
-    <span class="navbar-brand">
-      Ella Rises
-      <img src="/fulllogo.jpg" alt="Ella Rises Logo" style="width:35px; height:35px; object-fit: contain; vertical-align: text-bottom; margin-left: 8px;">
-    </span>
-
-    <div class="navbar-links mx-auto d-none d-lg-flex">
-      <a href="#about">About</a>
-      <a href="/displayEvents">Events</a>
-      <a href="/https://givebutter.com/EllaRises">Donate</a>
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-expand-lg navbar-custom sticky-top">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">💰 Budget<span>Planner</span></a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#navbarNav"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link active" href="#features">Features</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#benefits">Benefits</a>
+          </li>
+          <li class="nav-item ms-3">
+            <% if (!isLoggedIn) { %>
+            <a href="/login" class="btn-primary-custom" style="font-size: 0.9rem;">Login</a>
+            <a href="/signup" class="btn-secondary-custom" style="font-size: 0.9rem;">Sign Up</a>
+            <% } else { %>
+            <a href="/dashboard" class="btn-primary-custom" style="font-size: 0.9rem;">Dashboard</a>
+            <a href="/logout" class="btn-secondary-custom" style="font-size: 0.9rem;">Logout</a>
+            <% } %>
+          </li>
+        </ul>
+      </div>
     </div>
+  </nav>
 
-    <div class="nav-right d-none d-lg-flex">
+  <!-- HERO SECTION -->
+  <section class="hero">
+    <div class="container">
+      <h1>Take Control of Your Finances</h1>
+      <p>A simple, powerful tool to track your income and expenses with ease</p>
+      <div class="hero-buttons">
+        <% if (!isLoggedIn) { %>
+        <a href="/login" class="btn-primary-custom">Get Started</a>
+        <a href="#features" class="btn-secondary-custom">Learn More</a>
+        <% } else { %>
+        <a href="/dashboard" class="btn-primary-custom">Go to Dashboard</a>
+        <a href="#features" class="btn-secondary-custom">Learn More</a>
+        <% } %>
+      </div>
+    </div>
+  </section>
 
+  <!-- FEATURES SECTION -->
+  <section class="features-section" id="features">
+    <div class="container">
+      <h2 class="section-title">Powerful Features</h2>
+      <div class="row">
+        <div class="col-md-6 col-lg-4">
+          <div class="feature-card">
+            <div class="feature-icon">📊</div>
+            <h3>Track Everything</h3>
+            <p>Record all your income and expenses in one organized place. Categorize transactions for better insights.</p>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-4">
+          <div class="feature-card">
+            <div class="feature-icon">🔍</div>
+            <h3>Search & Filter</h3>
+            <p>Quickly find transactions by description or category. Filter by income or expenses to analyze spending patterns.</p>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-4">
+          <div class="feature-card">
+            <div class="feature-icon">✏️</div>
+            <h3>Edit & Manage</h3>
+            <p>Update or delete transactions anytime. Full control over your financial records with complete CRUD operations.</p>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-4">
+          <div class="feature-card">
+            <div class="feature-icon">💳</div>
+            <h3>Multiple Categories</h3>
+            <p>Pre-defined categories for income and expenses. Organize your transactions for better financial awareness.</p>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-4">
+          <div class="feature-card">
+            <div class="feature-icon">🔐</div>
+            <h3>Secure & Private</h3>
+            <p>Your data is encrypted and secure. Passwords are hashed using industry-standard bcrypt encryption.</p>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-4">
+          <div class="feature-card">
+            <div class="feature-icon">📱</div>
+            <h3>Responsive Design</h3>
+            <p>Works seamlessly on desktop, tablet, and mobile devices. Access your budget planner anywhere, anytime.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BENEFITS SECTION -->
+  <section class="benefits-section" id="benefits">
+    <div class="container">
+      <h2 class="section-title">Why Choose Budget Planner?</h2>
+      <div class="benefits-grid">
+        <div class="benefit-item">
+          <h4>📈 Financial Awareness</h4>
+          <p>Gain better control over your finances and understand where your money goes each month.</p>
+        </div>
+        <div class="benefit-item">
+          <h4>💡 Smart Budgeting</h4>
+          <p>See your income vs. expenses at a glance. Make informed decisions for better financial health.</p>
+        </div>
+        <div class="benefit-item">
+          <h4>🎯 Goal Tracking</h4>
+          <p>Monitor spending patterns over time. Develop healthy budgeting habits for long-term success.</p>
+        </div>
+        <div class="benefit-item">
+          <h4>👨‍👩‍👧‍👦 Family Friendly</h4>
+          <p>Perfect for personal finances or small family budgeting. Each account is completely private and secure.</p>
+        </div>
+        <div class="benefit-item">
+          <h4>⚡ Easy to Use</h4>
+          <p>Simple, intuitive interface that anyone can use. No complex setup or steep learning curve.</p>
+        </div>
+        <div class="benefit-item">
+          <h4>🌍 Always Available</h4>
+          <p>Cloud-based solution means you can access your budget from anywhere with an internet connection.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA SECTION -->
+  <section class="cta-section">
+    <div class="container">
+      <h2>Ready to Take Control?</h2>
+      <p>Start tracking your finances today and build better budgeting habits</p>
       <% if (!isLoggedIn) { %>
-          <!-- SHOW WHEN LOGGED OUT -->
-          <a href="/login">Login</a>
+      <a href="/signup" class="btn-primary-custom">Create Your Account</a>
+      <a href="/login" class="btn-secondary-custom">Already have an account? Login</a>
       <% } else { %>
-          <!-- SHOW WHEN LOGGED IN -->
-          <a href="/logout">Logout</a>
-          <a href="/userDashboard">View Dashboard</a>
+      <a href="/dashboard" class="btn-primary-custom">Go to Your Dashboard</a>
       <% } %>
     </div>
-  </div>
-</nav>
+  </section>
 
-
-<!-- HERO / WELCOME SECTION -->
-<section class="hero">
-    <h1>Together We Are</h1>
-    <h1>Ella Rises</h1>
-    <h4>Inviting young women to pursue higher education and embrace their heritage</h4>
-    <h4>by providing culturally rooted programs and educational experiences.</h4>
-
-  <div class="hero-buttons">
-    <a href="/displayEvents" class="btn btn-white">View Events</a>
-    <a href="/displaySurveys" class="btn btn-white">Take Survey</a>
-    <a href="/displayMilestones" class="btn btn-white">Milestones</a>
-    <a href="https://givebutter.com/EllaRises" class="btn btn-donate">Donate</a>
-  </div>
-</section>
-
-
-<!-- EVENTS SECTION -->
-<div class="section-wrapper">
-<section id="events" class="container">
-  <h2 class="section-title">Upcoming Events</h2>
-
-  <div class="img-placeholder">EVENT IMAGE HERE</div>
-
-  <div class="text-center mt-4">
-    <a href="/displayEvents" class="btn btn-white">View Events</a>
-  </div>
-</section>
-</div>
-
-
-<!-- PROGRAMS SECTION -->
-<div class="section-wrapper" style="background-color: var(--cream);">
-<section id="programs" class="container">
-  <h2 class="section-title">Our Programs</h2>
-
-  <div class="row g-4">
-
-    <div class="col-md-6 col-lg-3">
-      <div class="program-card">
-        <!-- Anders putting in images -->
-        <img src="/BalletImage.jpeg" alt="Ballet Event" class="img-placeholder">
-        <h4>Ballet Folklorico</h4>
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-section">
+        <h4>💰 Budget Planner</h4>
+        <p>Your personal finance companion for tracking income and expenses.</p>
+      </div>
+      <div class="footer-section">
+        <h4>Features</h4>
+        <ul>
+          <li><a href="#features">Track Transactions</a></li>
+          <li><a href="#features">Search & Filter</a></li>
+          <li><a href="#features">Secure & Safe</a></li>
+          <li><a href="#features">Responsive Design</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h4>Account</h4>
+        <ul>
+          <% if (!isLoggedIn) { %>
+          <li><a href="/login">Login</a></li>
+          <li><a href="/signup">Sign Up</a></li>
+          <% } else { %>
+          <li><a href="/dashboard">Dashboard</a></li>
+          <li><a href="/logout">Logout</a></li>
+          <% } %>
+        </ul>
       </div>
     </div>
-
-    <div class="col-md-6 col-lg-3">
-      <div class="program-card">
-        <!-- Anders putting in images -->
-        <img src="/Mariachi.jpeg" alt="Mariachi Event" class="img-placeholder">
-        <h4>Mariachi</h4>
-      </div>
+    <div class="footer-bottom">
+      <p>&copy; 2025 Personal Budget Planner. All rights reserved.</p>
+      <p>Helping you achieve financial awareness and responsibility.</p>
     </div>
+  </footer>
 
-    <div class="col-md-6 col-lg-3">
-      <div class="program-card">
-        <!-- Anders putting in images -->
-        <img src="/SummitImage.jpg" alt="Summit Event" class="img-placeholder">
-        <h4>Summit + Educational Pathways</h4>
-      </div>
-    </div>
-
-    <div class="col-md-6 col-lg-3">
-      <div class="program-card">
-        <!-- Anders putting in images -->
-        <img src="/SteamImage.jpeg" alt="STEAM Event" class="img-placeholder">
-        <h4>STEAM</h4>
-      </div>
-    </div>
-
-  </div>
-</section>
-</div>
-
-
-<!-- DONATION SECTION (MERGED WITH THANK YOU) -->
-<div class="section-wrapper">
-<section id="donate" class="container">
-  <h2 class="section-title">Support Our Mission</h2>
-
-  <!-- Anders putting in images -->
-  <img src="/Donate.jpeg" alt="Donate" class="img-placeholder">
-
-  <div class="text-center mt-4">
-    <a href="/https://givebutter.com/EllaRises" class="btn btn-donate">Donate Now</a>
-  </div>
-
-  <!-- THANK YOU CONTENT MOVED HERE -->
-  <div class="mt-5 text-center" style="max-width: 750px; margin-left: auto; margin-right: auto;">
-    <h3 class="mt-5" style="font-family: 'DM Serif Display', serif;">Thank You</h3>
-    <p style="font-size: 1.1rem;">
-      A big thank you to our supporters who make it possible for us to accomplish our
-      goals and provide these wonderful programs for our young women!
-      <br><br>
-      Your generous contributions have lasting impact.
-    </p>
-  </div>
-
-</section>
-</div>
-
-
-<!-- ABOUT SECTION -->
-<div class="section-wrapper" id="about" style="background-color: var(--cream);">
-<section class="container">
-  <h2 class="section-title">About Ella Rises</h2>
-
-  <p class="text-center mx-auto" style="max-width: 750px; font-size: 1.2rem;">
-    Inviting young women to pursue higher education and embrace their heritage
-    by providing culturally rooted programs and educational experiences.
-  </p>
-</section>
-</div>
-
-
-<!-- FOOTER -->
-<div class="footer">
-  <div class="footer-text">
-    Ella 
-    <img src="/EllaRises.jpg" alt="Logo" style="width:30px; height:auto; vertical-align: middle;">
-    Rises
-  </div>
-</div>
-
-<p class="copyright">© 2025 Ella Rises. All Rights Reserved.</p>
-
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

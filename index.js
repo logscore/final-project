@@ -1,6 +1,7 @@
 // import express
 const express = require("express");
 const connectPgSimple = require("connect-pg-simple");
+const bcrypt = require("bcrypt");
 
 // create express object
 const app = express();
@@ -48,12 +49,13 @@ app.use(
 
 // global authentication middleware
 app.use((req, res, next) => {
-  // Skip authentication for login routes
+  // Skip authentication for login routes and API endpoints
   if (
     req.path === "/" ||
     req.path === "/login" ||
     req.path === "/signup" ||
-    req.path === "/logout"
+    req.path === "/logout" ||
+    req.path.startsWith("/api/")
   ) {
     return next();
   }
@@ -96,20 +98,35 @@ app.post("/login", (req, res) => {
   }
 
   knex("users")
-    .select("email", "password")
+    .select("*")
     .where("email", sEmail)
-    .andWhere("password", sPassword)
-    .then((users) => {
-      if (users.length > 0 && users[0].password === sPassword) {
-        req.session.isLoggedIn = true;
-        req.session.userId = users[0].id;
-        req.session.email = users[0].email;
-        console.log(`User logged in: ${users[0].email} (ID: ${users[0].id})`);
-        res.redirect("/dashboard");
-      } else {
+    .first()
+    .then((user) => {
+      if (!user) {
         console.warn(`Failed login attempt for email: ${sEmail}`);
-        res.render("login", { error_message: "Invalid email or password" });
+        return res.render("login", { error_message: "Invalid email or password" });
       }
+
+      bcrypt.compare(sPassword, user.password, (err, isMatch) => {
+        if (err) {
+          console.error("Password comparison error:", err);
+          return res.render("login", {
+            error_message: "Database error. Please try again.",
+          });
+        }
+
+        if (isMatch) {
+          req.session.isLoggedIn = true;
+          req.session.userId = user.id;
+          req.session.email = user.email;
+          req.session.name = user.name;
+          console.log(`User logged in: ${user.email} (ID: ${user.id})`);
+          res.redirect("/dashboard");
+        } else {
+          console.warn(`Failed login attempt for email: ${sEmail}`);
+          res.render("login", { error_message: "Invalid email or password" });
+        }
+      });
     })
     .catch((err) => {
       console.error("Login error:", err);
@@ -143,29 +160,39 @@ app.post("/signup", (req, res) => {
     });
   }
 
-  knex("users")
-    .select("email")
-    .where("email", email)
-    .then((users) => {
-      if (users.length > 0) {
-        return res.render("signup", {
-          error_message: "Email already exists.",
-        });
-      }
-
-      return knex("users")
-        .insert({ name, email, password })
-        .then(() => {
-          console.log(`New user created: ${email}`);
-          res.redirect("/login");
-        });
-    })
-    .catch((err) => {
-      console.error("Signup error:", err);
-      res.render("signup", {
-        error_message: "Database error. Please try again.",
+  // Hash password with bcrypt
+  bcrypt.hash(password, 10, (err, hashedPassword) => {
+    if (err) {
+      console.error("Password hashing error:", err);
+      return res.render("signup", {
+        error_message: "An error occurred. Please try again.",
       });
-    });
+    }
+
+    knex("users")
+      .select("email")
+      .where("email", email)
+      .then((users) => {
+        if (users.length > 0) {
+          return res.render("signup", {
+            error_message: "Email already exists.",
+          });
+        }
+
+        return knex("users")
+          .insert({ name, email, password: hashedPassword })
+          .then(() => {
+            console.log(`New user created: ${email}`);
+            res.redirect("/login");
+          });
+      })
+      .catch((err) => {
+        console.error("Signup error:", err);
+        res.render("signup", {
+          error_message: "Database error. Please try again.",
+        });
+      });
+  });
 });
 
 app.get("/logout", (req, res) => {
@@ -178,6 +205,221 @@ app.get("/logout", (req, res) => {
 // public landing page
 app.get("/", (req, res) => {
   res.render("index", { isLoggedIn: req.session.isLoggedIn || false });
+});
+
+// ==============================
+// DASHBOARD - Display all transactions
+// ==============================
+app.get("/dashboard", (req, res) => {
+  const userId = req.session.userId;
+  const searchTerm = req.query.search || "";
+  const filterType = req.query.type || "all";
+
+  let query = knex("transactions")
+    .where("user_id", userId)
+    .select("transactions.*", "categories.name as category_name")
+    .leftJoin("categories", "transactions.category_id", "categories.id")
+    .orderBy("transaction_date", "desc");
+
+  // Apply search filter
+  if (searchTerm) {
+    query = query.where((builder) => {
+      builder
+        .where("description", "ilike", `%${searchTerm}%`)
+        .orWhere("categories.name", "ilike", `%${searchTerm}%`);
+    });
+  }
+
+  // Apply type filter
+  if (filterType !== "all") {
+    query = query.where("transactions.type", filterType);
+  }
+
+  query
+    .then((transactions) => {
+      // Calculate summary stats
+      const stats = {
+        totalIncome: 0,
+        totalExpense: 0,
+        balance: 0,
+        transactionCount: transactions.length,
+      };
+
+      transactions.forEach((t) => {
+        if (t.type === "income") {
+          stats.totalIncome += parseFloat(t.amount);
+        } else {
+          stats.totalExpense += parseFloat(t.amount);
+        }
+      });
+
+      stats.balance = stats.totalIncome - stats.totalExpense;
+
+      res.render("dashboard", {
+        transactions,
+        stats,
+        userName: req.session.name,
+        userEmail: req.session.email,
+        searchTerm,
+        filterType,
+      });
+    })
+    .catch((err) => {
+      console.error("Dashboard error:", err);
+      res.render("dashboard", {
+        transactions: [],
+        stats: { totalIncome: 0, totalExpense: 0, balance: 0, transactionCount: 0 },
+        userName: req.session.name,
+        userEmail: req.session.email,
+        searchTerm,
+        filterType,
+        error_message: "Error loading transactions",
+      });
+    });
+});
+
+// ==============================
+// ADD TRANSACTION
+// ==============================
+app.get("/add-transaction", (req, res) => {
+  knex("categories")
+    .where("user_id", req.session.userId)
+    .then((categories) => {
+      res.render("add-transaction", {
+        categories,
+        userName: req.session.name,
+      });
+    })
+    .catch((err) => {
+      console.error("Categories error:", err);
+      res.redirect("/dashboard");
+    });
+});
+
+app.post("/add-transaction", (req, res) => {
+  const { type, amount, description, category_id, transaction_date } = req.body;
+  const userId = req.session.userId;
+
+  if (!type || !amount || !description || !category_id || !transaction_date) {
+    return res.status(400).json({ error: "All fields are required" });
+  }
+
+  const parsedAmount = parseFloat(amount);
+  if (isNaN(parsedAmount) || parsedAmount <= 0) {
+    return res.status(400).json({ error: "Amount must be a positive number" });
+  }
+
+  knex("transactions")
+    .insert({
+      user_id: userId,
+      type,
+      amount: parsedAmount,
+      description,
+      category_id: parseInt(category_id),
+      transaction_date,
+    })
+    .then(() => {
+      res.redirect("/dashboard");
+    })
+    .catch((err) => {
+      console.error("Add transaction error:", err);
+      res.status(500).json({ error: "Failed to add transaction" });
+    });
+});
+
+// ==============================
+// EDIT TRANSACTION
+// ==============================
+app.get("/edit-transaction/:id", (req, res) => {
+  const transactionId = parseInt(req.params.id);
+  const userId = req.session.userId;
+
+  Promise.all([
+    knex("transactions")
+      .where("id", transactionId)
+      .where("user_id", userId)
+      .first(),
+    knex("categories").where("user_id", userId),
+  ])
+    .then(([transaction, categories]) => {
+      if (!transaction) {
+        return res.status(404).render("error", { message: "Transaction not found" });
+      }
+
+      // Format date for input field
+      const transactionDate = transaction.transaction_date
+        .toISOString()
+        .split("T")[0];
+
+      res.render("edit-transaction", {
+        transaction: { ...transaction, transaction_date: transactionDate },
+        categories,
+        userName: req.session.name,
+      });
+    })
+    .catch((err) => {
+      console.error("Edit transaction error:", err);
+      res.redirect("/dashboard");
+    });
+});
+
+app.post("/edit-transaction/:id", (req, res) => {
+  const transactionId = parseInt(req.params.id);
+  const userId = req.session.userId;
+  const { type, amount, description, category_id, transaction_date } = req.body;
+
+  if (!type || !amount || !description || !category_id || !transaction_date) {
+    return res.status(400).json({ error: "All fields are required" });
+  }
+
+  const parsedAmount = parseFloat(amount);
+  if (isNaN(parsedAmount) || parsedAmount <= 0) {
+    return res.status(400).json({ error: "Amount must be a positive number" });
+  }
+
+  knex("transactions")
+    .where("id", transactionId)
+    .where("user_id", userId)
+    .update({
+      type,
+      amount: parsedAmount,
+      description,
+      category_id: parseInt(category_id),
+      transaction_date,
+    })
+    .then((rowsAffected) => {
+      if (rowsAffected === 0) {
+        return res.status(404).json({ error: "Transaction not found" });
+      }
+      res.redirect("/dashboard");
+    })
+    .catch((err) => {
+      console.error("Update transaction error:", err);
+      res.status(500).json({ error: "Failed to update transaction" });
+    });
+});
+
+// ==============================
+// DELETE TRANSACTION
+// ==============================
+app.get("/delete-transaction/:id", (req, res) => {
+  const transactionId = parseInt(req.params.id);
+  const userId = req.session.userId;
+
+  knex("transactions")
+    .where("id", transactionId)
+    .where("user_id", userId)
+    .del()
+    .then((rowsAffected) => {
+      if (rowsAffected === 0) {
+        return res.status(404).json({ error: "Transaction not found" });
+      }
+      res.redirect("/dashboard");
+    })
+    .catch((err) => {
+      console.error("Delete transaction error:", err);
+      res.status(500).json({ error: "Failed to delete transaction" });
+    });
 });
 
 app.get("/health", (req, res) => {
