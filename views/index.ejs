@@ -22,17 +22,44 @@
     .navbar-custom {
       background: white;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      padding: 1rem 0;
+      padding: 1.5rem 0;
+      min-height: 80px;
+      display: flex;
+      align-items: center;
+    }
+
+    .navbar-custom .container-fluid {
+      display: flex;
+      align-items: center;
+      position: relative;
     }
 
     .navbar-brand {
       font-size: 1.8rem;
       font-weight: 700;
       color: #667eea !important;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      margin: 0;
     }
 
     .navbar-brand span {
       color: #764ba2;
+    }
+
+    .navbar-nav {
+      position: absolute;
+      right: 15px;
+      margin-bottom: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .navbar-nav .nav-item {
+      display: flex;
+      align-items: center;
     }
 
     .navbar-nav .nav-link {
@@ -40,6 +67,8 @@
       color: #555 !important;
       margin: 0 0.5rem;
       transition: color 0.3s;
+      display: flex;
+      align-items: center;
     }
 
     .navbar-nav .nav-link:hover {
@@ -193,8 +222,33 @@
 
     .benefits-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      grid-template-columns: repeat(4, 1fr);
       gap: 2rem;
+    }
+
+    .benefits-grid .benefit-item:nth-child(5) {
+      grid-column: 2 / 3;
+    }
+
+    .benefits-grid .benefit-item:nth-child(6) {
+      grid-column: 3 / 4;
+    }
+
+    @media (max-width: 1200px) {
+      .benefits-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      
+      .benefits-grid .benefit-item:nth-child(5),
+      .benefits-grid .benefit-item:nth-child(6) {
+        grid-column: auto;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .benefits-grid {
+        grid-template-columns: 1fr;
+      }
     }
 
     .benefit-item {
@@ -467,10 +521,6 @@
   <!-- FOOTER -->
   <footer class="footer">
     <div class="footer-content">
-      <div class="footer-section">
-        <h4>💰 Budget Planner</h4>
-        <p>Your personal finance companion for tracking income and expenses.</p>
-      </div>
       <div class="footer-section">
         <h4>Features</h4>
         <ul>
