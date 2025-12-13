@@ -411,4 +411,3 @@ app.get("/health", (req, res) => {
 app.listen(port, "0.0.0.0", () => {
   console.log(`The server is listening port ${process.env.APP_PORT}`);
 });
-

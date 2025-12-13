@@ -1,4 +1,3 @@
--- script to create tables for a personal finance management application
 -- Drop existing tables in correct order
 DROP TABLE IF EXISTS transactions CASCADE;
 DROP TABLE IF EXISTS categories CASCADE;
