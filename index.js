@@ -1,7 +1,6 @@
 // import express
 const express = require("express");
 const connectPgSimple = require("connect-pg-simple");
-const bcrypt = require("bcrypt");
 
 // create express object
 const app = express();
@@ -199,7 +198,7 @@ app.get("/dashboard", (req, res) => {
   const filterType = req.query.type || "all";
 
   let query = knex("transactions")
-    .where("user_id", userId)
+    .where("transactions.user_id", userId)
     .select("transactions.*", "categories.name as category_name")
     .leftJoin("categories", "transactions.category_id", "categories.id")
     .orderBy("transaction_date", "desc");
@@ -326,7 +325,7 @@ app.get("/edit-transaction/:id", (req, res) => {
       .where("id", transactionId)
       .where("user_id", userId)
       .first(),
-    knex("categories").where("user_id", userId),
+    knex("categories"),
   ])
     .then(([transaction, categories]) => {
       if (!transaction) {
