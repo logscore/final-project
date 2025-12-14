@@ -104,7 +104,9 @@ app.post("/login", (req, res) => {
     .then((user) => {
       if (!user) {
         console.warn(`Failed login attempt for email: ${sEmail}`);
-        return res.render("login", { error_message: "Invalid email or password" });
+        return res.render("login", {
+          error_message: "Invalid email or password",
+        });
       }
 
       if (sPassword === user.password) {
@@ -249,7 +251,12 @@ app.get("/dashboard", (req, res) => {
       console.error("Dashboard error:", err);
       res.render("dashboard", {
         transactions: [],
-        stats: { totalIncome: 0, totalExpense: 0, balance: 0, transactionCount: 0 },
+        stats: {
+          totalIncome: 0,
+          totalExpense: 0,
+          balance: 0,
+          transactionCount: 0,
+        },
         userName: req.session.name,
         userEmail: req.session.email,
         searchTerm,
@@ -264,7 +271,6 @@ app.get("/dashboard", (req, res) => {
 // ==============================
 app.get("/add-transaction", (req, res) => {
   knex("categories")
-    .where("user_id", req.session.userId)
     .then((categories) => {
       res.render("add-transaction", {
         categories,
@@ -324,7 +330,9 @@ app.get("/edit-transaction/:id", (req, res) => {
   ])
     .then(([transaction, categories]) => {
       if (!transaction) {
-        return res.status(404).render("error", { message: "Transaction not found" });
+        return res
+          .status(404)
+          .render("error", { message: "Transaction not found" });
       }
 
       // Format date for input field
